@@ -1,4 +1,4 @@
-package com.rntest.newarchitecture.modules;
+package com.zhxlp.rntest.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;
