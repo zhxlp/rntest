@@ -80,36 +80,3 @@ export async function checkAndRequestPermissions(
   }
   return requestPermissions(permissions);
 }
-
-/**
- * 检查是否有对扩展存储的读取和写入权限
- * @returns 是否有权限
- */
-export async function checkExternalStoragePermission(): Promise<boolean> {
-  return checkPermissions([
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  ]);
-}
-
-/**
- * 请求对扩展存储的读取和写入权限
- * @returns 结果
- */
-export async function requestExternalStoragePermission(): Promise<PermissionStatus> {
-  return requestPermissions([
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  ]);
-}
-/**
- * 检查和请求对扩展存储的读取和写入权限
- * @returns 是否成功
- */
-export async function checkAndRequestExternalStoragePermission(): Promise<boolean> {
-  const res = await checkAndRequestPermissions([
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  ]);
-  return res === PermissionsAndroid.RESULTS.GRANTED;
-}

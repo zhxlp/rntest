@@ -1,8 +1,6 @@
 import {Platform} from 'react-native';
 import RNFS from 'react-native-fs';
-import {join, parse, toDirPath} from './path';
-import {checkAndRequestExternalStoragePermission} from './permissions';
-import {name as appName} from '../../app.json';
+import {join, toDirPath} from './path';
 import {BaseResult} from './common';
 
 export const FS_ERROR = {
@@ -53,32 +51,13 @@ export function printPath() {
  * @param paths 追加路径
  * @returns 路径
  */
-export function getAppExternalStoragePath(...paths: string[]): string {
+export function getAppStoragePath(...paths: string[]): string {
   let dataPath = RNFS.DocumentDirectoryPath;
 
   if (Platform.OS === 'android') {
-    dataPath = join(RNFS.ExternalStorageDirectoryPath, appName);
+    dataPath = RNFS.ExternalDirectoryPath;
   }
   return join(dataPath, ...paths);
-}
-
-/**
- * 是否为需要权限访问的外部存储目录
- * @param path 路径
- * @returns 是否
- */
-export function isExternalStoragePath(path: string): boolean {
-  if (Platform.OS !== 'android') {
-    return false;
-  }
-  if (!path.startsWith(RNFS.ExternalStorageDirectoryPath)) {
-    return false;
-  }
-  const dir = parse(RNFS.ExternalDirectoryPath).dir;
-  if (path.startsWith(dir)) {
-    return false;
-  }
-  return true;
 }
 
 /**
@@ -88,15 +67,6 @@ export function isExternalStoragePath(path: string): boolean {
  */
 export async function mkdir(path: string): Promise<BaseResult<boolean>> {
   try {
-    if (isExternalStoragePath(path)) {
-      const perm = await checkAndRequestExternalStoragePermission();
-      if (!perm) {
-        return BaseResult.error(
-          FS_ERROR.PERMISSION_DENIED,
-          'Permission denied',
-        );
-      }
-    }
     await RNFS.mkdir(path);
     return BaseResult.success(true);
   } catch (err) {
@@ -148,15 +118,6 @@ export async function readDir(
   showHide: boolean = true,
 ): Promise<BaseResult<ReadDirItem[]>> {
   try {
-    if (isExternalStoragePath(path)) {
-      const perm = await checkAndRequestExternalStoragePermission();
-      if (!perm) {
-        return BaseResult.error(
-          FS_ERROR.PERMISSION_DENIED,
-          'Permission denied',
-        );
-      }
-    }
     const res = await RNFS.readDir(path);
     let list;
     if (showHide) {
