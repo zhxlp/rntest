@@ -1,0 +1,57 @@
+diff --git a/node_modules/react-native-share-menu/android/src/main/java/com/meedan/ShareMenuModule.java b/node_modules/react-native-share-menu/android/src/main/java/com/meedan/ShareMenuModule.java
+index 09abd7b..1bca3f4 100644
+--- a/node_modules/react-native-share-menu/android/src/main/java/com/meedan/ShareMenuModule.java
++++ b/node_modules/react-native-share-menu/android/src/main/java/com/meedan/ShareMenuModule.java
+@@ -59,16 +59,18 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
+     data.putString(MIME_TYPE_KEY, type);
+ 
+     if (Intent.ACTION_SEND.equals(action)) {
+-      if ("text/plain".equals(type)) {
+-        data.putString(DATA_KEY, intent.getStringExtra(Intent.EXTRA_TEXT));
+-        return data;
+-      }
+-
+       Uri fileUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+       if (fileUri != null) {
+         data.putString(DATA_KEY, fileUri.toString());
+         return data;
+       }
++      if ("text/plain".equals(type)) {
++        String text = intent.getStringExtra(Intent.EXTRA_TEXT);
++        if(text != null && text != ""){
++          data.putString(DATA_KEY, text);
++          return data;
++        }
++      }
+     } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+       ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+       if (fileUris != null) {
+@@ -121,6 +123,14 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
+             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+             .emit(NEW_SHARE_EVENT, shared);
+   }
++  @ReactMethod
++  public void addListener(String eventName) {
++    // Set up any upstream listeners or background tasks as necessary
++  }
++  @ReactMethod
++  public void removeListeners(Integer count) {
++    // Remove upstream listeners, stop unnecessary background tasks
++  }
+ 
+   public void clearSharedText() {
+     Activity mActivity = getCurrentActivity();
+@@ -134,12 +144,10 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
+       return;
+     }
+ 
++    intent.removeExtra(Intent.EXTRA_STREAM);
+     if ("text/plain".equals(type)) {
+       intent.removeExtra(Intent.EXTRA_TEXT);
+-      return;
+     }
+-
+-    intent.removeExtra(Intent.EXTRA_STREAM);
+   }
+ 
+   @Override
